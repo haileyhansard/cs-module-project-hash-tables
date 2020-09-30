@@ -6,7 +6,7 @@ class HashTableEntry:
         self.key = key
         self.value = value
         self.next = None
-
+#you could have 8 LinkedLists at a time because we have 8 slots, and each slot contains a LL
 
 # Hash table can't have fewer than this many slots
 MIN_CAPACITY = 8
@@ -52,7 +52,11 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        # DAY 2 
         load_factor = self.total/self.capacity
+
+        if load_factor > 0.7:
+            self.resize(self.capacity*2)
 
         return load_factor
 
@@ -95,10 +99,34 @@ class HashTable:
         Implement this.
         """
         # Your code here
-        index = self.hash_index(key)
-        self.table[index] = value
+        # DAY 1
+        # index = self.hash_index(key) #get the index
+        # self.table[index] = value #at the index in the table, store the value
+        # #to save key somewhere, need to use LinkedList, utilize key, will be helpful for collisions.
         
+        # self.total += 1 #increment the total # of slots filled by 1
+
+        # DAY 2
+        #Hash the key and Get the index for the key
+        #Search the LL at that index for the key
+        #If the key is found, overwrite the value stored there
+        #Else, insert the new HashTableEntry key and value at the head of the list at that index
+        index = self.hash_index(key)
+
+        if self.table[index] is None:
+            self.table[index] = HashTableEntry(key, value)
+        else:
+            cur = self.table[index]
+            if cur.key == key:
+                cur.value = value
+            else:
+                while cur.next is not None:
+                    if cur.next.key == key:
+                        cur.next.value = value
+                    cur = cur.next
+                cur.next = HashTableEntry(key, value)
         self.total += 1
+        self.get_load_factor()
 
 
     def delete(self, key):
@@ -110,13 +138,50 @@ class HashTable:
         Implement this.
         """
         # Your code here
-        if not self.hash_index(key):
-            print('key is not found')
+        # DAY 1
+        # if not self.hash_index(key): #if the key at index is not found
+        #     print('key is not found')
         
-        index = self.hash_index(key)
-        self.table[index] = None
+        # index = self.hash_index(key)
+        # self.table[index] = None #this will essentially remove the value at index because its now set to None
 
-        self.total -= 1
+        # self.total -= 1 #decrement the total # of slots filled
+
+        # DAY 2
+        #Hash the key and get an index
+        #Search through the LL for the matching key at that index
+        #If found, Delete that node
+        #Return the value of the deleted node (Else, if not found, return None)
+        #moving two pointers along
+        index = self.hash_index(key)
+        prev = self.table[index]
+        cur = prev.next
+
+        if prev is None:
+            print('Key not found')
+        if prev.key == key:
+            deleted_node = self.table[index]
+            self.table[index] = prev.next
+
+            self.total -= 1
+            self.get_load_factor()
+            return deleted_node
+
+        while cur is not None:
+            if cur.key == key:
+                prev.next = cur.next
+                cur.next = None
+
+                self.total -=1
+                self.get_load_factor()
+
+                return cur
+
+            prev = cur
+            cur = cur.next ####need to check against Artem's lecture if this is correctly finished?
+
+        print("Key not found")
+
 
     def get(self, key):
         """
@@ -127,9 +192,26 @@ class HashTable:
         Implement this.
         """
         # Your code here
-        index = self.hash_index(key)
-        return self.table[index]
+        # DAY 1
+        # index = self.hash_index(key)
+
+        # if not self.table[index]:
+        #     return
+        # else:
+        #     return self.table[index]
         
+        # DAY 2
+        index = self.hash_index(key)
+        cur = self.table[index]
+
+        if cur is None:
+            return
+        
+        while cur is not None:
+            if cur.key == key:
+                return cur.value
+            cur = cur.next
+        return
 
     def resize(self, new_capacity):
         """
@@ -139,7 +221,18 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        #If load factor is 0.7, then double the size of hash table capacity.
+        #Make a new array that is DOUBLE the current size of hash table
+        #Re-populate the new array, go through each item (LL) in the array, and re-hash it (because hash index is based on the length!)
+        #Insert the items into their new locations
 
+        new_table = HashTable(new_capacity)
+
+        for node in self.table:
+            if node is not None:
+                new_table.put(node.key, node.value)
+        self.capacity = new_capacity
+        self.table = new_table.table
 
 
 if __name__ == "__main__":
