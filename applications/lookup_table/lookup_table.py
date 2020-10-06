@@ -7,11 +7,16 @@ import math
 """
 U
 
-This algorithm 
-INPUT:
-OUTPUT:
+INPUT: two integers x and y
+OUTPUT: integer that is the computation of all the math equations
+the print statement is going to print 
 
 P
+- create a dictionary (cache)
+- check if (x, y) is in cache
+- if yes, return cache at index (x,y)
+- else, set cache at index (x, y) = the_other_function(x, y)
+
 E
 R
 """
@@ -31,7 +36,7 @@ def slowfun(x, y):
     output, but completes quickly instead of taking ages to run.
     """
     # Your code here
-    if cache.get((x, y)):
+    if (x, y) in cache:
         return cache[(x, y)]
     else:
         v = math.pow(x, y)
