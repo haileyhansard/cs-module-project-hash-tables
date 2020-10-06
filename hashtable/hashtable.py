@@ -53,6 +53,7 @@ class HashTable:
         """
         # Your code here
         # DAY 2 
+        # When capacity is 0.7, resize to double the hash table size.
         load_factor = self.total/self.capacity
 
         if load_factor > 0.7:
